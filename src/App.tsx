@@ -10,13 +10,10 @@ import { FilterBar } from './components/FilterBar/FilterBar';
 import { ChecklistPanel } from './components/Checklist/ChecklistPanel';
 import { RoadmapPanel } from './components/Roadmap/RoadmapPanel';
 import { Settings } from './components/Settings/Settings';
-import { Login } from './components/Login/Login'; // <-- Import do Login
 import { AppState, TabMode, Urgency, Milestone, PanelData } from './types';
 
-// ID fixo para o painel no banco
 const BOARD_ID = '11111111-1111-1111-1111-111111111111'; 
 
-// Templates vazios para iniciar limpo
 const EMPTY_DATA: Record<string, PanelData> = {
   back: { color: 'back', sections: [] },
   front: { color: 'front', sections: [{ title: 'Trilha de posts — metas de engajamento orgânico', items: [], isTrail: true }] },
@@ -25,28 +22,11 @@ const EMPTY_DATA: Record<string, PanelData> = {
 const EMPTY_MARCOS: Milestone[] = [];
 
 export default function App() {
-  // ================= AUTENTICAÇÃO ================= //
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('checklist_auth') === 'true';
-  });
-
-  const handleLogin = () => {
-    localStorage.setItem('checklist_auth', 'true');
-    setIsAuthenticated(true);
-  };
-
-  // Se não estiver logado, trava na tela de Login
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-  // ================================================ //
-
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'home' | 'settings'>('home');
   const [currentTab, setCurrentTab] = useState<TabMode>('back');
   const [activeFilter, setActiveFilter] = useState('all');
   
-  // Estados de Dados (Sincronizados)
   const [appData, setAppData] = useState(EMPTY_DATA); 
   const [milestones, setMilestones] = useState<Milestone[]>(EMPTY_MARCOS);
   const [launchDate, setLaunchDate] = useState<string | null>(null);
@@ -56,7 +36,6 @@ export default function App() {
 
   const lastSyncStr = useRef("");
 
-  // 1. CARREGAR DO BANCO E OUVIR REALTIME
   useEffect(() => {
     const fetchBoard = async () => {
       const { data, error } = await supabase.from('launch_board').select('*').eq('id', BOARD_ID).single();
@@ -110,7 +89,6 @@ export default function App() {
     return () => { supabase.removeChannel(channel); };
   }, []);
 
-  // 2. AUTO-SAVE NO BANCO
   useEffect(() => {
     if (loading) return;
     const currentStr = JSON.stringify({ appData, milestones, checklistState, itemUrgencies, itemDates, launchDate });

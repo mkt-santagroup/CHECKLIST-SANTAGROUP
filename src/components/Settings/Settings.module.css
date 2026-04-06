@@ -274,3 +274,24 @@
 .iconDanger:hover { background: #3a1010; color: #E05252; }
 
 .emptyState { padding: 40px; text-align: center; color: #555; font-size: 13px; font-style: italic; border: 1px dashed #222; border-radius: 10px; }
+
+.infoTextarea {
+  width: 100%;
+  background: #0e0e0f;
+  border: 1px dashed #222;
+  border-radius: 8px;
+  color: #aaa;
+  font-size: 12px;
+  padding: 8px 12px;
+  font-family: 'Inter', sans-serif;
+  resize: vertical;
+  min-height: 40px;
+  outline: none;
+  transition: all 0.2s;
+  margin-bottom: 12px;
+}
+
+.infoTextarea:focus {
+  border-color: #534AB7;
+  color: #eee;
+}

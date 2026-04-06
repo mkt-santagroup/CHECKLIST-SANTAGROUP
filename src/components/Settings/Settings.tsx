@@ -21,7 +21,7 @@ export const Settings = ({
   const [expandedSec, setExpandedSec] = useState<number | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
 
-  // D&D
+  // D&D e Menus
   const [draggedTask, setDraggedTask] = useState<{si: number, ii: number} | null>(null);
   const [dragOverTask, setDragOverTask] = useState<{si: number, ii: number} | null>(null);
   const [openUrgencyKey, setOpenUrgencyKey] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export const Settings = ({
     if (!newItemText[si]?.trim()) return;
     setAppData((prev) => {
       const newSections = [...prev[selectedCat].sections];
-      newSections[si] = { ...newSections[si], items: [...newSections[si].items, { label: newItemText[si], urgency: 'planejamento' }] };
+      newSections[si] = { ...newSections[si], items: [...newSections[si].items, { label: newItemText[si], urgency: 'planejamento', info: '' }] };
       return { ...prev, [selectedCat]: { ...prev[selectedCat], sections: newSections } };
     });
     setExpandedTasks(prev => ({ ...prev, [`${si}_${appData[selectedCat].sections[si].items.length}`]: true }));
@@ -188,14 +188,13 @@ export const Settings = ({
     setEditingPost(null);
   };
 
-  // ================= DRAG AND DROP ROBUSTO ================= //
+  // ================= DRAG AND DROP ================= //
   const handleDragStart = (e: React.DragEvent, si: number, ii: number) => {
     setDraggedTask({ si, ii });
-    // Usamos setTimeout para o elemento original não sumir na mesma hora
     setTimeout(() => { e.dataTransfer.effectAllowed = 'move'; }, 0);
   };
   const handleDragOver = (e: React.DragEvent, si: number, ii: number) => {
-    e.preventDefault(); // SUPER IMPORTANTE para permitir o Drop!
+    e.preventDefault(); 
     if (draggedTask && draggedTask.si === si) {
       if (dragOverTask?.ii !== ii) setDragOverTask({ si, ii });
     }
@@ -226,14 +225,13 @@ export const Settings = ({
   const IconTrash = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" strokeLinecap="round" strokeLinejoin="round"/></svg>;
   const IconGrip = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg>;
 
-  // Classes de Layout (1 ou 2 colunas dependendo se estamos na Frontline)
   const isFrontline = selectedCat === 'front';
 
   return (
     <div className={styles.settingsContainer}>
       <div className={styles.pageHeader}>
         <h2 className={styles.pageTitle}>Gerenciar Checklists</h2>
-        <p className={styles.pageSubtitle}>Personalize categorias, arraste tarefas para reordenar, ajuste prazos e níveis de urgência.</p>
+        <p className={styles.pageSubtitle}>Personalize categorias, adicione descrições, arraste tarefas para reordenar, ajuste prazos e níveis de urgência.</p>
       </div>
 
       <div className={styles.catSelector}>
@@ -255,7 +253,7 @@ export const Settings = ({
 
           <div className={styles.accordionList}>
             {appData[selectedCat].sections.map((sec, si) => {
-              if (sec.isTrail) return null; // Não renderizar a trilha aqui
+              if (sec.isTrail) return null; 
               return (
                 <div key={si} className={styles.secCard}>
                   <div className={`${styles.secHeader} ${expandedSec === si ? styles.secHeaderOpen : ''}`}>
@@ -310,6 +308,8 @@ export const Settings = ({
 
                             {isTaskExpanded && (
                               <div className={styles.taskExpandedBody}>
+                                
+                                {/* METADATA (Urgência e Prazo) */}
                                 <div className={styles.itemConfigRow}>
                                   <div className={styles.pillWrap}>
                                     <button className={`${styles.urgPill} ${styles[meta.cls]}`} onClick={() => setOpenUrgencyKey(openUrgencyKey === itemKey ? null : itemKey)}>
@@ -332,7 +332,24 @@ export const Settings = ({
                                     {currentDate && (<button className={styles.clearDateBtn} onClick={() => setItemDates({...itemDates, [itemKey]: null})}>✕</button>)}
                                   </div>
                                 </div>
+
+                                {/* CAMPO DE DESCRIÇÃO (Aparece o 'i' na Home) */}
+                                <textarea
+                                  className={styles.infoTextarea}
+                                  placeholder="Adicionar descrição ou informações adicionais da tarefa..."
+                                  value={item.info || ''}
+                                  onChange={(e) => {
+                                    setAppData(prev => {
+                                      const newSections = [...prev[selectedCat].sections];
+                                      const newItems = [...newSections[si].items];
+                                      newItems[ii] = { ...newItems[ii], info: e.target.value };
+                                      newSections[si].items = newItems;
+                                      return { ...prev, [selectedCat]: { ...prev[selectedCat], sections: newSections } };
+                                    });
+                                  }}
+                                />
                                 
+                                {/* SUBTAREFAS */}
                                 <div className={styles.subtasksWrap}>
                                   {item.subtasks?.map((sub, subI) => (
                                     <div key={subI} className={styles.subtaskRow}>
@@ -353,6 +370,7 @@ export const Settings = ({
                                     <input type="text" placeholder="Adicionar subtarefa e apertar Enter..." value={newSubtaskText[`${si}_${ii}`] || ''} onChange={(e) => setNewSubtaskText({ ...newSubtaskText, [`${si}_${ii}`]: e.target.value })} />
                                   </form>
                                 </div>
+
                               </div>
                             )}
                           </div>

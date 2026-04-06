@@ -13,9 +13,7 @@ interface ChecklistItemProps {
   isSubtaskChecked: (subI: number) => boolean;
   onToggleSubtask: (subI: number) => void;
   urgency: Urgency;
-  onUrgencyChange: (urg: Urgency) => void;
   date: string | null;
-  onDateChange: (date: string | null) => void;
   isHidden: boolean;
 }
 
@@ -64,24 +62,25 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({
           {item.optional && <span className={styles.optional}>opcional</span>}
         </span>
         
-        {/* Urgência apenas visual (sem onClick/dropdown) */}
         <div className={styles.pillWrap}>
           <span className={`${styles.urgPill} ${styles[meta.cls]}`}>
             {meta.emoji} {meta.text}
           </span>
         </div>
 
-        {/* Data apenas visual */}
         {getDaysPill()}
 
-        {/* Botão de info se existir descrição */}
         {item.info && (
-          <button className={styles.infoBtn} onClick={(e) => { e.stopPropagation(); setIsPanelOpen(!isPanelOpen); }}>
+          <button
+            className={`${styles.infoBtn} ${isPanelOpen ? styles.active : ''}`}
+            onClick={(e) => { e.stopPropagation(); setIsPanelOpen(!isPanelOpen); }}
+          >
             i
           </button>
         )}
       </div>
 
+      {/* SUBTAREFAS */}
       {item.subtasks && item.subtasks.length > 0 && !isChecked && (
         <div className={styles.subtasksWrapper}>
           {item.subtasks.map((sub, sIdx) => {
@@ -100,7 +99,7 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({
         </div>
       )}
 
-      {/* Painel inferior só mostra a info agora */}
+      {/* PAINEL DE INFORMAÇÕES (Só exibe o texto de descrição agora) */}
       {item.info && (
         <div className={`${styles.itemBottom} ${isPanelOpen ? styles.open : ''}`}>
           <div className={styles.infoText}>{item.info}</div>
