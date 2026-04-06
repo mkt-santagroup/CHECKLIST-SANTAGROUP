@@ -1,0 +1,216 @@
+.item {
+  background: #141416;
+  border: 1px solid #222225;
+  border-radius: 10px;
+  margin-bottom: 6px;
+  overflow: visible;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.item.hidden {
+  display: none;
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+  border-radius: 10px;
+}
+
+.itemRow:hover {
+  background: #181819;
+}
+
+.item.done .itemRow {
+  opacity: 0.38;
+}
+
+.checkbox {
+  width: 19px;
+  height: 19px;
+  border-radius: 5px;
+  border: 1.5px solid #2e2e2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.cbBack { background: #534AB7; border-color: #534AB7; }
+.cbFront { background: #1D9E75; border-color: #1D9E75; }
+.cbEntregaveis { background: #E08C2A; border-color: #E08C2A; }
+
+.checkIcon {
+  display: none;
+  width: 10px;
+  height: 10px;
+}
+
+.cbBack .checkIcon,
+.cbFront .checkIcon,
+.cbEntregaveis .checkIcon {
+  display: block;
+}
+
+.itemLabel {
+  font-size: 13px;
+  color: #c8c8c6;
+  flex: 1;
+  line-height: 1.45;
+  min-width: 0;
+}
+
+.item.done .itemLabel {
+  text-decoration: line-through;
+  color: #3a3a3e;
+}
+
+.optional {
+  font-size: 10px;
+  color: #444;
+  background: #1e1e20;
+  border: 1px solid #2a2a2e;
+  padding: 1px 6px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.pillWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.urgPill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  cursor: default; /* Alterado de pointer para default */
+  transition: all 0.15s;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  user-select: none;
+}
+
+.urgPill.urgente { background: #2a1010; border: 1px solid #4a2020; color: #E05252; }
+.urgPill.importante { background: #2a1e08; border: 1px solid #4a3010; color: #E08C2A; }
+.urgPill.planejamento { background: #252308; border: 1px solid #403e10; color: #C9BA2A; }
+.urgPill.opcional { background: #1c1c1e; border: 1px solid #2a2a2e; color: #555; }
+
+.daysPill {
+  display: none;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+  gap: 4px;
+}
+
+.daysPill.visible { display: flex; }
+.daysPill.overdue { background: #2a1010; border: 1px solid #4a2020; color: #E05252; }
+.daysPill.today { background: #2a1e08; border: 1px solid #4a3010; color: #E08C2A; }
+.daysPill.near { background: #252308; border: 1px solid #403e10; color: #C9BA2A; }
+.daysPill.ok { background: #0a2018; border: 1px solid #1a4a30; color: #1D9E75; }
+.daysPill.far { background: #1c1c1e; border: 1px solid #2a2a2e; color: #555; }
+
+.infoBtn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #2a2a2e;
+  background: none;
+  color: #444;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.infoBtn:hover { border-color: #555; color: #888; }
+
+.itemBottom {
+  display: none;
+  border-top: 1px solid #1c1c1e;
+  padding: 10px 14px 12px;
+  background: #111113;
+  border-radius: 0 0 10px 10px;
+}
+
+.itemBottom.open {
+  display: block;
+}
+
+.infoText {
+  font-size: 12px;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* === SUBTAREFAS === */
+.subtasksWrapper {
+  border-top: 1px dashed #1c1c1e;
+  padding: 8px 14px;
+  background: #111113;
+}
+
+.subtaskRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  padding-left: 28px;
+}
+
+.subtaskRow:hover {
+  background: #18181a;
+}
+
+.subtaskRow.done {
+  opacity: 0.4;
+}
+
+.subtaskRow.done .subLabel {
+  text-decoration: line-through;
+}
+
+.subCheckbox {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid #2e2e2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.subLabel {
+  font-size: 12px;
+  color: #a8a8a6;
+  flex: 1;
+}

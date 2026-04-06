@@ -1,0 +1,60 @@
+.filterBar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #2a2a2e;
+  background: #141416;
+  color: #666;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.filterBtn:hover {
+  border-color: #444;
+  color: #aaa;
+}
+
+.filterBtn.active[data-filter="all"] {
+  background: #2a2a2e;
+  border-color: #444;
+  color: #ccc;
+}
+
+.filterBtn.active[data-filter="urgente"] {
+  background: #3a1010;
+  border-color: #E05252;
+  color: #E05252;
+}
+
+.filterBtn.active[data-filter="importante"] {
+  background: #2a1e08;
+  border-color: #E08C2A;
+  color: #E08C2A;
+}
+
+.filterBtn.active[data-filter="planejamento"] {
+  background: #28260a;
+  border-color: #C9BA2A;
+  color: #C9BA2A;
+}
+
+.filterBtn.active[data-filter="opcional"] {
+  background: #1e1e20;
+  border-color: #555;
+  color: #999;
+}
+
+.filterBtn.active[data-filter="com-data"] {
+  background: #0a1e28;
+  border-color: #4a9ec0;
+  color: #4a9ec0;
+}

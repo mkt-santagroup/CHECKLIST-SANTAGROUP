@@ -1,0 +1,102 @@
+.launchBanner {
+  background: #141416;
+  border: 1px solid #2a2a2e;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.launchBannerLeft {
+  flex: 1;
+  min-width: 160px;
+}
+
+.launchLabel {
+  font-size: 10px;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-family: 'Syne', sans-serif;
+  margin-bottom: 4px;
+}
+
+.launchDateDisplay {
+  font-family: 'Syne', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  color: #f0f0ee;
+}
+
+.launchDateDisplay.empty {
+  color: #333;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.launchCountdown {
+  font-size: 12px;
+  color: #555;
+  margin-top: 3px;
+}
+
+.launchCountdown.urgente {
+  color: #E05252;
+}
+
+.launchCountdown.proximo {
+  color: #E08C2A;
+}
+
+.launchCountdown.ok {
+  color: #1D9E75;
+}
+
+.dateInputWrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dateInput {
+  background: #0e0e0f;
+  border: 1px solid #2a2a2e;
+  border-radius: 8px;
+  color: #ccc;
+  font-size: 13px;
+  padding: 7px 10px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.dateInput:focus {
+  border-color: #534AB7;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  filter: invert(0.4);
+  cursor: pointer;
+}
+
+.clearDateBtn {
+  font-size: 11px;
+  color: #444;
+  background: none;
+  border: 1px solid #2a2a2e;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.clearDateBtn:hover {
+  color: #888;
+  border-color: #444;
+}

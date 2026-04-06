@@ -1,0 +1,159 @@
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3a3a3e;
+  margin-bottom: 10px;
+  padding-left: 2px;
+  font-family: 'Syne', sans-serif;
+}
+
+.marco {
+  background: #0e1a15;
+  border: 1px solid #1a2e24;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+
+.marcoHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.marcoNum {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1D9E75;
+  min-width: 28px;
+}
+
+.marcoTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ccc;
+  flex: 1;
+}
+
+.metaBadge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #0a2018;
+  border: 1px solid #1D9E75;
+  color: #1D9E75;
+  white-space: nowrap;
+}
+
+.marcoPosts {
+  padding: 0 14px 12px 14px;
+  border-top: 1px solid #1a2e24;
+}
+
+.postRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #131a17;
+}
+
+.postRow:last-child {
+  border-bottom: none;
+}
+
+.postCheck {
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  border: 1.5px solid #2a3a32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.postCheck.done {
+  background: #1D9E75;
+  border-color: #1D9E75;
+}
+
+.pcheckIcon {
+  display: none;
+  width: 9px;
+  height: 9px;
+}
+
+.postCheck.done .pcheckIcon {
+  display: block;
+}
+
+.postLabel {
+  font-size: 12.5px;
+  color: #999;
+  flex: 1;
+  cursor: pointer;
+}
+
+.postRow.pdone .postLabel {
+  text-decoration: line-through;
+  color: #3a4a40;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #1a2e24;
+}
+
+.metaCheck {
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  border: 1.5px solid #1D9E75;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.metaCheck.done {
+  background: #1D9E75;
+}
+
+.metaCheck.done .pcheckIcon {
+  display: block;
+}
+
+.metaLabel {
+  font-size: 11.5px;
+  color: #666;
+  flex: 1;
+}
+
+.metaLabel span {
+  color: #1D9E75;
+  font-weight: 700;
+}
+
+.unlocks {
+  font-size: 10px;
+  color: #3a5a48;
+  margin-left: 4px;
+}

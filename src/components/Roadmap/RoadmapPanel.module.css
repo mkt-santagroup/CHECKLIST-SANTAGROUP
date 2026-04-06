@@ -1,0 +1,122 @@
+.roadmapView {
+  padding: 10px 0;
+}
+
+.roadmapEmpty {
+  color: #666;
+  text-align: center;
+  padding: 40px 20px;
+  font-style: italic;
+  background: #141416;
+  border: 1px dashed #2a2a2e;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.timeline {
+  border-left: 2px solid #2a2a2e;
+  margin-left: 8px;
+  padding-left: 24px;
+  position: relative;
+}
+
+.timelineItem {
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.timelineDot {
+  position: absolute;
+  left: -31px;
+  top: 2px;
+  width: 12px;
+  height: 12px;
+  background: #444;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px #0e0e0f;
+}
+
+.timelineDot.hoje { background: #E08C2A; }
+.timelineDot.futuro { background: #1D9E75; }
+.timelineDot.passado { background: #E05252; }
+
+.timelineDate {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f0f0ee;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timelineDateLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: #1a1a1c;
+  border: 1px solid #2a2a2e;
+  color: #888;
+}
+
+.timelineDateLabel.hoje {
+  background: #2a1e08;
+  border-color: #E08C2A;
+  color: #E08C2A;
+}
+
+.timelineTasks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tlTask {
+  background: #141416;
+  border: 1px solid #222225;
+  padding: 12px 14px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.tlTask:hover {
+  border-color: #333;
+  background: #181819;
+}
+
+.tlTask.done {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.tlTaskSource {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.tlSourceBack { background: #1a1638; color: #8a7df0; border: 1px solid #2f2866; }
+.tlSourceFront { background: #0a2018; color: #1D9E75; border: 1px solid #14402a; }
+.tlSourceEntregaveis { background: #2a1e08; color: #E08C2A; border: 1px solid #4a3010; }
+
+.tlTaskLabel {
+  font-size: 13px;
+  color: #ccc;
+  flex: 1;
+  line-height: 1.4;
+}
+
+.tlUrgency {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

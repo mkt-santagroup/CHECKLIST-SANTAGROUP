@@ -1,0 +1,41 @@
+.urgencyLegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.urgBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #555;
+  background: #141416;
+  border: 1px solid #222225;
+  border-radius: 20px;
+  padding: 4px 10px;
+}
+
+.urgDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.urgDot.urgente {
+  background: #E05252;
+}
+
+.urgDot.importante {
+  background: #E08C2A;
+}
+
+.urgDot.planejamento {
+  background: #C9BA2A;
+}
+
+.urgDot.opcional {
+  background: #444;
+}

@@ -1,0 +1,18 @@
+.panel {
+  display: block;
+}
+
+.section {
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3a3a3e;
+  margin-bottom: 10px;
+  padding-left: 2px;
+  font-family: 'Syne', sans-serif;
+}

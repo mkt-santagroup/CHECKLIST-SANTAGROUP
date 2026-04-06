@@ -1,0 +1,276 @@
+.settingsContainer {
+  background: #0e0e0f;
+  margin-top: 1rem;
+  padding-bottom: 4rem;
+}
+
+.pageHeader {
+  margin-bottom: 1.5rem;
+}
+
+.pageTitle {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  color: #f0f0ee;
+  margin-bottom: 4px;
+}
+
+.pageSubtitle { color: #888; font-size: 13px; }
+
+/* Tabs Categories */
+.catSelector {
+  display: flex;
+  background: #141416;
+  border-radius: 12px;
+  padding: 6px;
+  border: 1px solid #222225;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.catBtn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #666;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.catBtn:hover { color: #aaa; background: #1a1a1c; }
+.catBtn.active { background: #2a2a2e; color: #fff; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+
+/* ==== GRID LAYOUT: 1 OU 2 COLUNAS ==== */
+.layoutGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.twoColumns {
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 900px) {
+  .twoColumns { grid-template-columns: 1fr; }
+}
+
+/* Main Add Form */
+.addFormBase {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  background: #111113;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px dashed #2a2a2e;
+}
+
+.inputMain {
+  flex: 1;
+  background: #0a0a0b;
+  border: 1px solid #222225;
+  border-radius: 8px;
+  color: #eee;
+  font-size: 14px;
+  padding: 0 16px;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.inputMain:focus { border-color: #534AB7; }
+
+.submitBtnMain {
+  background: #534AB7;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.submitBtnMain:hover:not(:disabled) { background: #443c9e; }
+.submitBtnMain:disabled { background: #1a1638; color: #444; cursor: not-allowed; }
+
+.submitBtnTrail {
+  background: #1D9E75;
+  color: #fff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.submitBtnTrail:hover:not(:disabled) { background: #157e5d; }
+.submitBtnTrail:disabled { background: #1a2e24; color: #444; cursor: not-allowed; }
+
+/* Accordion & Cards */
+.accordionList { display: flex; flex-direction: column; gap: 12px; }
+
+.secCard {
+  background: #141416;
+  border: 1px solid #222225;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.secCard:hover { border-color: #333; }
+
+.secHeader {
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #161618;
+  transition: background 0.2s;
+}
+.secHeaderOpen { background: #1a1a1c; border-bottom: 1px solid #222225; }
+
+.secTitleWrap { display: flex; align-items: center; gap: 12px; flex: 1; cursor: pointer; }
+.secTitle { font-size: 14px; font-weight: 600; color: #e8e8e6; }
+.secBadge { font-size: 10px; color: #888; background: #0e0e0f; padding: 3px 8px; border-radius: 12px; border: 1px solid #222; }
+.chevron { font-size: 10px; color: #666; margin-left: 10px; cursor: pointer; }
+
+/* Trilha Exclusiva */
+.trailHeader { margin-bottom: 1rem; }
+.trailTitle { font-family: 'Syne', sans-serif; font-size: 18px; color: #1D9E75; font-weight: 700; }
+.trailCard { border-color: #1a2e24; }
+.trailCard:hover { border-color: #1D9E75; }
+.trailNum { color: #1D9E75; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; }
+
+.secBody { padding: 16px 18px; background: #0e0e0f; }
+
+/* DRAG & DROP ESTILOS */
+.itemBox {
+  background: #141416;
+  border: 1px solid #1c1c1e;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+}
+
+.itemBox:hover { background: #161618; border-color: #2a2a2e; }
+
+.dragOverActive {
+  border-top: 3px solid #534AB7;
+  transform: translateY(2px);
+}
+
+.beingDragged {
+  opacity: 0.3;
+  border: 1px dashed #534AB7;
+}
+
+/* IGNORA EVENTOS DOS FILHOS DURANTE O DRAG PARA NAO BUGAR */
+.beingDragged * { pointer-events: none; }
+
+.itemRow { display: flex; align-items: center; gap: 8px; }
+
+.dragHandle {
+  cursor: grab;
+  color: #444;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+.dragHandle:hover { background: #222; color: #888; }
+.dragHandle svg { width: 14px; height: 14px; }
+.dragHandle:active { cursor: grabbing; }
+
+.itemLabel { font-size: 13.5px; color: #dcdcdc; font-weight: 500; flex: 1; cursor: pointer; }
+
+.taskChevron { font-size: 10px; color: #555; cursor: pointer; padding: 4px; margin-left: 4px; }
+.taskChevron:hover { color: #888; }
+
+.taskExpandedBody {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed #222;
+  margin-left: 28px;
+}
+
+/* Meta Configurações (Urgência e Data) */
+.itemConfigRow { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #1c1c1e; }
+.pillWrap { position: relative; }
+
+.urgPill {
+  display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600;
+  padding: 5px 12px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; font-family: 'Inter', sans-serif;
+}
+.urgPill.urgente { background: #2a1010; border-color: #4a2020; color: #E05252; }
+.urgPill.importante { background: #2a1e08; border-color: #4a3010; color: #E08C2A; }
+.urgPill.planejamento { background: #252308; border-color: #403e10; color: #C9BA2A; }
+.urgPill.opcional { background: #1c1c1e; border-color: #2a2a2e; color: #aaa; }
+.urgDot { width: 8px; height: 8px; border-radius: 50%; }
+
+.urgDropdown { position: absolute; top: calc(100% + 6px); left: 0; background: #141416; border: 1px solid #2a2a2e; border-radius: 10px; padding: 6px; z-index: 100; min-width: 140px; box-shadow: 0 8px 24px rgba(0,0,0,0.8); }
+.urgOpt { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: background 0.15s; }
+.urgOpt:hover { background: #1e1e20; }
+.urgOpt.selected { background: #1a1a1c; }
+.urgOpt.selected::after { content: '✓'; margin-left: auto; opacity: 0.6; color: inherit; }
+
+.datePickerWrap { display: flex; align-items: center; background: #0e0e0f; border: 1px solid #2a2a2e; border-radius: 8px; padding: 2px 8px; gap: 6px; }
+.dateIcon { font-size: 12px; opacity: 0.7; }
+.dateInput { background: transparent; border: none; color: #ccc; font-size: 12px; font-family: 'Inter', sans-serif; outline: none; cursor: pointer; }
+.dateInput::-webkit-calendar-picker-indicator { filter: invert(0.4); cursor: pointer; }
+.clearDateBtn { background: transparent; border: none; color: #666; font-size: 10px; cursor: pointer; padding: 2px 4px; }
+.clearDateBtn:hover { color: #E05252; }
+
+/* Subtasks */
+.subtasksWrap { display: flex; flex-direction: column; gap: 6px; }
+.subtaskRow { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.subtaskRow:hover .actionGroupSub { opacity: 1; }
+.subtaskTree { color: #444; font-size: 12px; }
+.subtaskLabel { font-size: 12px; color: #999; flex: 1; }
+
+.miniForm { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.miniForm input { flex: 1; background: transparent; border: none; border-bottom: 1px dashed #333; color: #888; font-size: 12px; padding: 4px 6px; outline: none; font-family: 'Inter', sans-serif; transition: all 0.2s; }
+.miniForm input:focus { border-bottom-color: #1D9E75; color: #ccc; }
+
+.addFormTask { display: flex; gap: 10px; margin-top: 16px; }
+.inputTask { flex: 1; background: #111113; border: 1px solid #222; border-radius: 8px; color: #ccc; font-size: 12.5px; padding: 8px 12px; font-family: 'Inter', sans-serif; outline: none; }
+.inputTask:focus { border-color: #534AB7; }
+
+.submitBtnTask { background: #1a1a1c; color: #ccc; border: 1px solid #333; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.submitBtnTask:hover:not(:disabled) { background: #222; color: #fff; }
+.submitBtnTask:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Edit Inputs */
+.editRow { flex: 1; margin-right: 12px; }
+.editInput { width: 100%; background: #000; border: 1px solid #534AB7; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13.5px; outline: none; }
+.editInputSmall { flex: 1; background: #000; border: 1px solid #534AB7; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 12px; outline: none; }
+
+/* Action Groups & Icons */
+.actionGroup { display: flex; align-items: center; gap: 4px; }
+.actionGroupTask { display: flex; align-items: center; gap: 4px; opacity: 0.4; transition: opacity 0.2s; }
+.itemBox:hover .actionGroupTask { opacity: 1; }
+.actionGroupSub { display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+
+.iconBtn, .iconBtnSmall, .iconBtnSub { background: transparent; border: none; color: #666; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.2s; }
+.iconBtn { width: 28px; height: 28px; }
+.iconBtn svg { width: 15px; height: 15px; }
+.iconBtnSmall { width: 24px; height: 24px; }
+.iconBtnSmall svg { width: 13px; height: 13px; }
+.iconBtnSub { width: 20px; height: 20px; }
+.iconBtnSub svg { width: 11px; height: 11px; }
+
+.iconBtn:hover, .iconBtnSmall:hover, .iconBtnSub:hover { background: #2a2a2e; color: #fff; }
+.iconDanger:hover { background: #3a1010; color: #E05252; }
+
+.emptyState { padding: 40px; text-align: center; color: #555; font-size: 13px; font-style: italic; border: 1px dashed #222; border-radius: 10px; }

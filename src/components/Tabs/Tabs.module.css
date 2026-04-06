@@ -1,0 +1,76 @@
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toggle {
+  display: flex;
+  background: #1a1a1c;
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid #2a2a2e;
+  gap: 4px;
+  width: fit-content;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 9px 24px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #666;
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+}
+
+.tab.activeBack {
+  background: #534AB7;
+  color: #fff;
+}
+
+.tab.activeFront {
+  background: #1D9E75;
+  color: #fff;
+}
+
+.tab.activeEntregaveis {
+  background: #E08C2A;
+  color: #fff;
+}
+
+.roadmapBtn {
+  background: #141416;
+  border: 1px solid #2a2a2e;
+  color: #ccc;
+  padding: 9px 20px;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.02em;
+}
+
+.roadmapBtn:hover {
+  background: #1a1a1c;
+  border-color: #444;
+  color: #fff;
+}
+
+.roadmapBtn.activeRoadmap {
+  background: #E05252;
+  border-color: #E05252;
+  color: #fff;
+}
