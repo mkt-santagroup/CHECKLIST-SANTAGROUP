@@ -10,16 +10,13 @@ import { FilterBar } from './components/FilterBar/FilterBar';
 import { ChecklistPanel } from './components/Checklist/ChecklistPanel';
 import { RoadmapPanel } from './components/Roadmap/RoadmapPanel';
 import { Settings } from './components/Settings/Settings';
-import { AppState, TabMode, Urgency, Milestone, PanelData } from './types';
 
-const BOARD_ID = '11111111-1111-1111-1111-111111111111'; 
+// A MÁGICA: Importando os dados originais de volta!
+import { DATA, MARCOS } from './constants/data';
+import { AppState, TabMode, Urgency, Milestone } from './types';
 
-const EMPTY_DATA: Record<string, PanelData> = {
-  back: { color: 'back', sections: [] },
-  front: { color: 'front', sections: [{ title: 'Trilha de posts — metas de engajamento orgânico', items: [], isTrail: true }] },
-  entregaveis: { color: 'entregaveis', sections: [] }
-};
-const EMPTY_MARCOS: Milestone[] = [];
+// Mudei o ID para ele criar uma nova linha 100% preenchida no seu banco
+const BOARD_ID = '22222222-2222-2222-2222-222222222222'; 
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -27,8 +24,9 @@ export default function App() {
   const [currentTab, setCurrentTab] = useState<TabMode>('back');
   const [activeFilter, setActiveFilter] = useState('all');
   
-  const [appData, setAppData] = useState(EMPTY_DATA); 
-  const [milestones, setMilestones] = useState<Milestone[]>(EMPTY_MARCOS);
+  // Estados de Dados (Agora iniciando com as constantes)
+  const [appData, setAppData] = useState(DATA); 
+  const [milestones, setMilestones] = useState<Milestone[]>(MARCOS);
   const [launchDate, setLaunchDate] = useState<string | null>(null);
   const [checklistState, setChecklistState] = useState<AppState>({ back: {}, front: {}, entregaveis: {} });
   const [itemUrgencies, setItemUrgencies] = useState<Record<string, Urgency>>({});
@@ -41,10 +39,11 @@ export default function App() {
       const { data, error } = await supabase.from('launch_board').select('*').eq('id', BOARD_ID).single();
 
       if (error || !data) {
+        // Se o banco for novo, INSERE O DATA E O MARCOS ORIGINAIS
         await supabase.from('launch_board').insert([{
           id: BOARD_ID,
-          app_data: EMPTY_DATA,
-          milestones: EMPTY_MARCOS,
+          app_data: DATA,
+          milestones: MARCOS,
           checklist_state: { back: {}, front: {}, entregaveis: {} },
           item_urgencies: {},
           item_dates: {},
