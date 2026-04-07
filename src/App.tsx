@@ -148,14 +148,14 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="container" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: '#534AB7' }}>
+      <div className="container wide" style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', color: '#534AB7' }}>
         <h2>Conectando ao banco de dados...</h2>
       </div>
     );
   }
 
   return (
-    <div className={`container ${currentView === 'settings' ? 'wide' : ''}`}>
+    <div className="container wide">
       <Header currentView={currentView} onNavigate={setCurrentView} />
 
       {currentView === 'settings' ? (
