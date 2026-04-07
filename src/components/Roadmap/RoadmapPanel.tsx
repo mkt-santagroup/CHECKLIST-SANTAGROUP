@@ -7,7 +7,7 @@ interface RoadmapPanelProps {
   dates: Record<string, string | null>;
   state: AppState;
   urgencies: Record<string, Urgency>;
-  appData: Record<string, PanelData>; // Recebendo os dados REAIS do banco!
+  appData: Record<string, PanelData>;
 }
 
 export const RoadmapPanel = ({ dates, state, urgencies, appData }: RoadmapPanelProps) => {

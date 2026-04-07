@@ -9,13 +9,17 @@ export interface ChecklistItemData {
   urgency: Urgency;
   info?: string;
   optional?: boolean;
-  subtasks?: Subtask[]; // <-- Nova propriedade adicionada
+  subtasks?: Subtask[];
 }
 
 export interface Section {
+  id?: string;
   title: string;
+  color?: string; 
+  hasGoals?: boolean;
+  goalText?: string; // <-- NOVO: Guarda o texto da meta!
   items: ChecklistItemData[];
-  isTrail?: boolean;
+  isTrail?: boolean; 
 }
 
 export interface PanelData {
@@ -23,11 +27,11 @@ export interface PanelData {
   sections: Section[];
 }
 
-export interface Milestone {
+export interface Goal {
+  id: string;
+  categoryId: string;
   title: string;
-  meta: number | null;
-  unlocks: string | null;
-  posts: string[];
+  completed: boolean;
 }
 
 export interface AppState {

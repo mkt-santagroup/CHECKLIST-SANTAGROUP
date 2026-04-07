@@ -11,8 +11,8 @@ import { ChecklistPanel } from './components/Checklist/ChecklistPanel';
 import { RoadmapPanel } from './components/Roadmap/RoadmapPanel';
 import { Settings } from './components/Settings/Settings';
 
-import { DATA, MARCOS } from './constants/data';
-import { AppState, TabMode, Urgency, Milestone } from './types';
+import { DATA } from './constants/data';
+import { AppState, TabMode, Urgency } from './types';
 
 const BOARD_ID = '22222222-2222-2222-2222-222222222222';
 
@@ -23,7 +23,6 @@ export default function App() {
   const [activeFilter, setActiveFilter] = useState('all');
 
   const [appData, setAppData] = useState(DATA);
-  const [milestones, setMilestones] = useState<Milestone[]>(MARCOS);
   const [launchDate, setLaunchDate] = useState<string | null>(null);
   const [checklistState, setChecklistState] = useState<AppState>({ back: {}, front: {}, entregaveis: {} });
   const [itemUrgencies, setItemUrgencies] = useState<Record<string, Urgency>>({});
@@ -41,7 +40,6 @@ export default function App() {
         await supabase.from('launch_board').insert([{
           id: BOARD_ID,
           app_data: DATA,
-          milestones: MARCOS,
           checklist_state: { back: {}, front: {}, entregaveis: {} },
           item_urgencies: {},
           item_dates: {},
@@ -49,14 +47,13 @@ export default function App() {
         }]);
       } else {
         setAppData(data.app_data);
-        setMilestones(data.milestones || []);
         setChecklistState(data.checklist_state);
         setItemUrgencies(data.item_urgencies);
         setItemDates(data.item_dates);
         setLaunchDate(data.launch_date);
 
         lastSyncStr.current = JSON.stringify({
-          appData: data.app_data, milestones: data.milestones, checklistState: data.checklist_state,
+          appData: data.app_data, checklistState: data.checklist_state,
           itemUrgencies: data.item_urgencies, itemDates: data.item_dates, launchDate: data.launch_date
         });
       }
@@ -73,7 +70,7 @@ export default function App() {
 
         const n = payload.new;
         const incoming = JSON.stringify({
-          appData: n.app_data, milestones: n.milestones, checklistState: n.checklist_state,
+          appData: n.app_data, checklistState: n.checklist_state,
           itemUrgencies: n.item_urgencies, itemDates: n.item_dates, launchDate: n.launch_date
         });
 
@@ -82,7 +79,6 @@ export default function App() {
 
         lastSyncStr.current = incoming;
         setAppData(n.app_data);
-        setMilestones(n.milestones || []);
         setChecklistState(n.checklist_state);
         setItemUrgencies(n.item_urgencies);
         setItemDates(n.item_dates);
@@ -95,7 +91,7 @@ export default function App() {
 
   useEffect(() => {
     if (loading) return;
-    const currentStr = JSON.stringify({ appData, milestones, checklistState, itemUrgencies, itemDates, launchDate });
+    const currentStr = JSON.stringify({ appData, checklistState, itemUrgencies, itemDates, launchDate });
     if (currentStr === lastSyncStr.current) return;
 
     const timer = setTimeout(async () => {
@@ -104,7 +100,6 @@ export default function App() {
 
       await supabase.from('launch_board').update({
         app_data: appData,
-        milestones: milestones,
         checklist_state: checklistState,
         item_urgencies: itemUrgencies,
         item_dates: itemDates,
@@ -116,7 +111,7 @@ export default function App() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [appData, milestones, checklistState, itemUrgencies, itemDates, launchDate, loading]);
+  }, [appData, checklistState, itemUrgencies, itemDates, launchDate, loading]);
 
   const stats = useMemo(() => {
     if (currentTab === 'roadmap') return { done: 0, total: 0, percentage: 0 };
@@ -166,7 +161,6 @@ export default function App() {
       {currentView === 'settings' ? (
         <Settings
           appData={appData} setAppData={setAppData}
-          milestones={milestones} setMilestones={setMilestones}
           itemUrgencies={itemUrgencies} setItemUrgencies={setItemUrgencies}
           itemDates={itemDates} setItemDates={setItemDates}
         />
@@ -183,18 +177,20 @@ export default function App() {
             <ChecklistPanel
               mode={currentTab}
               data={appData[currentTab]}
-              milestones={milestones}
               state={checklistState[currentTab]}
               onToggle={handleToggle}
               onToggleSubtask={handleToggleSubtask}
               urgencies={itemUrgencies}
-              onUrgencyChange={(key, urg) => setItemUrgencies((prev) => ({ ...prev, [key]: urg }))}
               dates={itemDates}
-              onDateChange={(key, date) => setItemDates((prev) => ({ ...prev, [key]: date }))}
               activeFilter={activeFilter}
             />
           ) : (
-            <RoadmapPanel dates={itemDates} state={checklistState} urgencies={itemUrgencies} appData={appData} />
+            <RoadmapPanel 
+              dates={itemDates} 
+              state={checklistState} 
+              urgencies={itemUrgencies} 
+              appData={appData} 
+            />
           )}
         </>
       )}

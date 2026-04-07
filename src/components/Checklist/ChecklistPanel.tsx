@@ -1,35 +1,47 @@
-import { PanelData, TabMode, Urgency, Milestone } from '../../types';
+import { PanelData, TabMode, Urgency } from '../../types';
 import { ChecklistItem } from './ChecklistItem';
-import { TrailSection } from '../Trail/TrailSection';
 import styles from './ChecklistPanel.module.css';
 
 interface ChecklistPanelProps {
   mode: TabMode;
   data: PanelData;
-  milestones: Milestone[];
   state: Record<string, boolean>;
   onToggle: (key: string) => void;
   onToggleSubtask: (si: number, ii: number, subI: number) => void;
   urgencies: Record<string, Urgency>;
-  onUrgencyChange: (key: string, urg: Urgency) => void;
   dates: Record<string, string | null>;
-  onDateChange: (key: string, date: string | null) => void;
   activeFilter: string;
 }
 
 export const ChecklistPanel = ({
-  mode, data, milestones, state, onToggle, onToggleSubtask, urgencies, onUrgencyChange, dates, onDateChange, activeFilter,
+  mode, data, state, onToggle, onToggleSubtask, urgencies, dates, activeFilter,
 }: ChecklistPanelProps) => {
   return (
     <div className={styles.panel}>
       {data.sections.map((section, si) => {
-        if (section.isTrail) {
-          return <TrailSection key="trail" milestones={milestones} />; // <--- Passado aqui!
-        }
+        if (section.isTrail) return null; 
 
         return (
           <div key={si} className={styles.section}>
-            <div className={styles.sectionTitle}>{section.title}</div>
+            <div className={styles.sectionTitle} style={{ color: section.color || '#FFFFFF' }}>
+              {section.title}
+            </div>
+            
+            {/* DESTAQUE DA META (Aparece direto no Checklist!) */}
+            {section.hasGoals && section.goalText && (
+              <div style={{ 
+                marginBottom: '16px', 
+                padding: '12px 16px', 
+                backgroundColor: 'rgba(255,255,255,0.03)', 
+                borderLeft: `4px solid ${section.color && section.color !== '#FFFFFF' ? section.color : '#534AB7'}`,
+                borderRadius: '0 8px 8px 0',
+                color: '#E4E4E7',
+                fontSize: '0.95rem'
+              }}>
+                🎯 <strong style={{ color: '#A1A1AA', marginRight: '6px' }}>Objetivo:</strong> {section.goalText}
+              </div>
+            )}
+            
             {section.items.map((item, ii) => {
               const key = `${mode}_${si}_${ii}`;
               const urgency = urgencies[key] || item.urgency;
@@ -42,10 +54,19 @@ export const ChecklistPanel = ({
               }
 
               return (
-                <ChecklistItem key={key} item={item} itemKey={key} mode={mode} isChecked={!!state[`${si}_${ii}`]}
-                  onToggle={() => onToggle(`${si}_${ii}`)} isSubtaskChecked={(subI) => !!state[`${si}_${ii}_sub_${subI}`]}
-                  onToggleSubtask={(subI) => onToggleSubtask(si, ii, subI)} urgency={urgency} onUrgencyChange={(urg: Urgency) => onUrgencyChange(key, urg)}
-                  date={date} onDateChange={(d: string | null) => onDateChange(key, d)} isHidden={isHidden} />
+                <ChecklistItem 
+                  key={key} 
+                  item={item} 
+                  itemKey={key} 
+                  mode={mode} 
+                  isChecked={!!state[`${si}_${ii}`]}
+                  onToggle={() => onToggle(`${si}_${ii}`)} 
+                  isSubtaskChecked={(subI) => !!state[`${si}_${ii}_sub_${subI}`]}
+                  onToggleSubtask={(subI) => onToggleSubtask(si, ii, subI)} 
+                  urgency={urgency} 
+                  date={date} 
+                  isHidden={isHidden} 
+                />
               );
             })}
           </div>

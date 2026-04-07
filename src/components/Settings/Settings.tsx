@@ -1,27 +1,41 @@
 import { useState, useRef } from 'react';
-import { PanelData, TabMode, Urgency, Milestone } from '../../types';
+import { PanelData, TabMode, Urgency } from '../../types';
 import { URGENCY_META } from '../../constants/data';
 import styles from './Settings.module.css';
 
 interface SettingsProps {
   appData: Record<string, PanelData>;
   setAppData: React.Dispatch<React.SetStateAction<Record<string, PanelData>>>;
-  milestones: Milestone[];
-  setMilestones: React.Dispatch<React.SetStateAction<Milestone[]>>;
   itemUrgencies: Record<string, Urgency>;
   setItemUrgencies: React.Dispatch<React.SetStateAction<Record<string, Urgency>>>;
   itemDates: Record<string, string | null>;
   setItemDates: React.Dispatch<React.SetStateAction<Record<string, string | null>>>;
 }
 
+// 5 CORES: Branco como padrão!
+const CORES_PREDEFINIDAS = ['#FFFFFF', '#8B5CF6', '#3B82F6', '#10B981', '#F59E0B']; 
+
+const generateId = () => typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36);
+
 export const Settings = ({
-  appData, setAppData, milestones, setMilestones, itemUrgencies, setItemUrgencies, itemDates, setItemDates
+  appData, setAppData, itemUrgencies, setItemUrgencies, itemDates, setItemDates
 }: SettingsProps) => {
   const [selectedCat, setSelectedCat] = useState<TabMode>('back');
   const [expandedSec, setExpandedSec] = useState<number | null>(null);
   const [expandedTasks, setExpandedTasks] = useState<Record<string, boolean>>({});
 
-  // D&D de ITENS dentro de uma seção
+  // Opções da Nova Categoria
+  const [newSubcatTitle, setNewSubcatTitle] = useState('');
+  const [selectedColor, setSelectedColor] = useState(CORES_PREDEFINIDAS[0]);
+  const [hasGoals, setHasGoals] = useState(false);
+  const [goalText, setGoalText] = useState('');
+
+  // Opções de Edição da Categoria
+  const [editColor, setEditColor] = useState(CORES_PREDEFINIDAS[0]);
+  const [editHasGoals, setEditHasGoals] = useState(false);
+  const [editGoalText, setEditGoalText] = useState('');
+
+  // D&D de ITENS
   const dragItem = useRef<{ si: number; ii: number } | null>(null);
   const dragOverItem = useRef<{ si: number; ii: number } | null>(null);
   const [dragOverKey, setDragOverKey] = useState<string | null>(null);
@@ -35,7 +49,6 @@ export const Settings = ({
 
   const [openUrgencyKey, setOpenUrgencyKey] = useState<string | null>(null);
 
-  const [newSubcatTitle, setNewSubcatTitle] = useState('');
   const [newItemText, setNewItemText] = useState<Record<number, string>>({});
   const [newSubtaskText, setNewSubtaskText] = useState<Record<string, string>>({});
   const [editingSec, setEditingSec] = useState<number | null>(null);
@@ -43,21 +56,27 @@ export const Settings = ({
   const [editingSubtask, setEditingSubtask] = useState<{ si: number; ii: number; subI: number } | null>(null);
   const [editValue, setEditValue] = useState('');
 
-  const [expandedMilestone, setExpandedMilestone] = useState<number | null>(null);
-  const [newMilestoneTitle, setNewMilestoneTitle] = useState('');
-  const [newPostText, setNewPostText] = useState<Record<number, string>>({});
-  const [editingMilestone, setEditingMilestone] = useState<number | null>(null);
-  const [editingPost, setEditingPost] = useState<{ mi: number; pi: number } | null>(null);
-
-  // ========================= SEÇÕES ========================= //
   const handleAddSubcat = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSubcatTitle.trim() || selectedCat === 'roadmap') return;
     setAppData(prev => ({
       ...prev,
-      [selectedCat]: { ...prev[selectedCat], sections: [{ title: newSubcatTitle, items: [] }, ...prev[selectedCat].sections] }
+      [selectedCat]: { 
+        ...prev[selectedCat], 
+        sections: [{ 
+          id: generateId(),
+          title: newSubcatTitle, 
+          color: selectedColor,
+          hasGoals: hasGoals,
+          goalText: goalText,
+          items: [] 
+        }, ...prev[selectedCat].sections] 
+      }
     }));
     setNewSubcatTitle('');
+    setHasGoals(false);
+    setGoalText('');
+    setSelectedColor(CORES_PREDEFINIDAS[0]);
   };
 
   const handleDeleteSec = (si: number) => {
@@ -70,23 +89,20 @@ export const Settings = ({
   };
 
   const saveEditSec = (si: number) => {
-    if (editValue.trim()) {
+    if (editValue.trim() || editColor) {
       setAppData(prev => {
         const s = [...prev[selectedCat].sections];
-        s[si] = { ...s[si], title: editValue };
+        s[si] = { ...s[si], title: editValue || s[si].title, color: editColor, hasGoals: editHasGoals, goalText: editGoalText };
         return { ...prev, [selectedCat]: { ...prev[selectedCat], sections: s } };
       });
     }
     setEditingSec(null);
   };
 
-  // Mover seção para cima/baixo com setas
   const moveSection = (si: number, dir: -1 | 1) => {
     const target = si + dir;
     const sections = appData[selectedCat].sections;
     if (target < 0 || target >= sections.length) return;
-    // Não deixar pular por cima de seção isTrail
-    if (sections[target]?.isTrail) return;
     setAppData(prev => {
       const s = [...prev[selectedCat].sections];
       [s[si], s[target]] = [s[target], s[si]];
@@ -95,7 +111,6 @@ export const Settings = ({
     setExpandedSec(target);
   };
 
-  // D&D de seções
   const handleSecDragStart = (e: React.DragEvent, si: number) => {
     dragSec.current = si;
     setDraggingSecIdx(si);
@@ -112,8 +127,6 @@ export const Settings = ({
     e.preventDefault();
     const from = dragSec.current;
     if (from === null || from === targetSi) { cleanSecDrag(); return; }
-    const sections = appData[selectedCat].sections;
-    if (sections[targetSi]?.isTrail || sections[from]?.isTrail) { cleanSecDrag(); return; }
     setAppData(prev => {
       const s = [...prev[selectedCat].sections];
       const [moved] = s.splice(from, 1);
@@ -130,7 +143,6 @@ export const Settings = ({
     setDragOverSecIdx(null);
   };
 
-  // ========================= ITENS ========================= //
   const handleAddItem = (e: React.FormEvent, si: number) => {
     e.preventDefault();
     if (!newItemText[si]?.trim()) return;
@@ -164,12 +176,10 @@ export const Settings = ({
     setEditingItem(null);
   };
 
-  // D&D de itens — reescrito com abordagem mais robusta
   const handleItemDragStart = (e: React.DragEvent, si: number, ii: number) => {
     dragItem.current = { si, ii };
     setDraggingKey(`${si}_${ii}`);
     e.dataTransfer.effectAllowed = 'move';
-    // Necessário para o drag funcionar em alguns browsers
     e.dataTransfer.setData('text/plain', `${si}_${ii}`);
   };
 
@@ -177,7 +187,7 @@ export const Settings = ({
     e.preventDefault();
     e.stopPropagation();
     if (!dragItem.current) return;
-    if (dragItem.current.si !== si) return; // só na mesma seção
+    if (dragItem.current.si !== si) return; 
     const key = `${si}_${ii}`;
     if (dragOverKey !== key) {
       dragOverItem.current = { si, ii };
@@ -209,7 +219,6 @@ export const Settings = ({
     setDragOverKey(null);
   };
 
-  // Drop zone invisível no final da lista para permitir mover para o último slot
   const handleDropZoneDragOver = (e: React.DragEvent, si: number) => {
     e.preventDefault();
     if (!dragItem.current || dragItem.current.si !== si) return;
@@ -223,7 +232,7 @@ export const Settings = ({
     const from = dragItem.current;
     if (!from || from.si !== si) { cleanItemDrag(); return; }
     const lastIdx = appData[selectedCat].sections[si].items.length;
-    if (from.ii === lastIdx - 1) { cleanItemDrag(); return; } // já é o último
+    if (from.ii === lastIdx - 1) { cleanItemDrag(); return; } 
 
     setAppData(prev => {
       const s = [...prev[selectedCat].sections];
@@ -236,7 +245,6 @@ export const Settings = ({
     cleanItemDrag();
   };
 
-  // ========================= SUBTAREFAS ========================= //
   const handleAddSubtask = (e: React.FormEvent, si: number, ii: number) => {
     e.preventDefault();
     const key = `${si}_${ii}`;
@@ -276,60 +284,6 @@ export const Settings = ({
     setEditingSubtask(null);
   };
 
-  // ========================= MILESTONES ========================= //
-  const handleAddMilestone = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMilestoneTitle.trim()) return;
-    setMilestones(prev => [...prev, { title: newMilestoneTitle, meta: null, unlocks: null, posts: [] }]);
-    setNewMilestoneTitle('');
-  };
-
-  const handleDeleteMilestone = (mi: number) => {
-    if (!confirm('Excluir esta meta da trilha?')) return;
-    setMilestones(prev => prev.filter((_, i) => i !== mi));
-  };
-
-  const handleAddPost = (e: React.FormEvent, mi: number) => {
-    e.preventDefault();
-    if (!newPostText[mi]?.trim()) return;
-    setMilestones(prev => {
-      const copy = [...prev];
-      copy[mi] = { ...copy[mi], posts: [...copy[mi].posts, newPostText[mi]] };
-      return copy;
-    });
-    setNewPostText({ ...newPostText, [mi]: '' });
-  };
-
-  const handleDeletePost = (mi: number, pi: number) => {
-    setMilestones(prev => {
-      const copy = [...prev];
-      copy[mi] = { ...copy[mi], posts: copy[mi].posts.filter((_, i) => i !== pi) };
-      return copy;
-    });
-  };
-
-  const saveEditMilestone = (mi: number) => {
-    if (editValue.trim()) {
-      setMilestones(prev => {
-        const copy = [...prev];
-        copy[mi] = { ...copy[mi], title: editValue };
-        return copy;
-      });
-    }
-    setEditingMilestone(null);
-  };
-
-  const saveEditPost = (mi: number, pi: number) => {
-    if (editValue.trim()) {
-      setMilestones(prev => {
-        const copy = [...prev];
-        copy[mi] = { ...copy[mi], posts: copy[mi].posts.map((p, i) => (i === pi ? editValue : p)) };
-        return copy;
-      });
-    }
-    setEditingPost(null);
-  };
-
   const toggleTaskExpansion = (si: number, ii: number) => {
     const key = `${si}_${ii}`;
     setExpandedTasks(prev => ({ ...prev, [key]: !prev[key] }));
@@ -341,13 +295,11 @@ export const Settings = ({
   const IconUp = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
   const IconDown = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-  const isFrontline = selectedCat === 'front';
-
   return (
     <div className={styles.settingsContainer}>
       <div className={styles.pageHeader}>
         <h2 className={styles.pageTitle}>Gerenciar Checklists</h2>
-        <p className={styles.pageSubtitle}>Personalize categorias, adicione descrições, arraste tarefas para reordenar, ajuste prazos e níveis de urgência.</p>
+        <p className={styles.pageSubtitle}>Personalize categorias, escolha cores de destaque, defina metas e organize suas tarefas.</p>
       </div>
 
       <div className={styles.catSelector}>
@@ -359,21 +311,54 @@ export const Settings = ({
         ))}
       </div>
 
-      <div className={`${styles.layoutGrid} ${isFrontline ? styles.twoColumns : ''}`}>
+      <div className={styles.layoutGrid} style={{ gridTemplateColumns: '1fr' }}>
 
-        {/* COLUNA 1: CHECKLISTS */}
         <div className={styles.colMain}>
-          <form className={styles.addFormBase} onSubmit={handleAddSubcat}>
-            <input type="text" className={styles.inputMain} placeholder="Nome da nova categoria/seção..."
-              value={newSubcatTitle} onChange={e => setNewSubcatTitle(e.target.value)} />
-            <button type="submit" className={styles.submitBtnMain} disabled={!newSubcatTitle.trim()}>+ Nova Categoria</button>
+          <form className={styles.addFormBase} onSubmit={handleAddSubcat} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '12px' }}>
+            <div style={{ display: 'flex', width: '100%', gap: '12px' }}>
+              <input type="text" className={styles.inputMain} placeholder="Nome da nova categoria/seção..."
+                value={newSubcatTitle} onChange={e => setNewSubcatTitle(e.target.value)} style={{ flex: 1 }} />
+              <button type="submit" className={styles.submitBtnMain} disabled={!newSubcatTitle.trim()}>+ Nova Categoria</button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px', width: '100%' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '0.85rem', color: '#A1A1AA' }}>Cor:</span>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    {CORES_PREDEFINIDAS.map(cor => (
+                      <button key={cor} type="button" onClick={() => setSelectedColor(cor)}
+                        style={{ backgroundColor: cor, width: '28px', height: '28px', borderRadius: '50%', border: selectedColor === cor ? '2px solid #534AB7' : '2px solid #333', cursor: 'pointer' }} />
+                    ))}
+                  </div>
+                </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem', color: '#E4E4E7' }}>
+                  <input type="checkbox" checked={hasGoals} onChange={(e) => setHasGoals(e.target.checked)} style={{ accentColor: selectedColor !== '#FFFFFF' ? selectedColor : '#534AB7', width: '18px', height: '18px' }} />
+                  <strong>Habilitar Metas para esta Categoria</strong>
+                </label>
+              </div>
+
+              {/* DESCE AQUI O CAMPO PARA ESCREVER A META SE ESTIVER MARCADO */}
+              {hasGoals && (
+                <div style={{ marginTop: '8px' }}>
+                  <input 
+                    type="text" 
+                    className={styles.inputMain} 
+                    placeholder="Escreva qual é a meta desta categoria..." 
+                    value={goalText} 
+                    onChange={e => setGoalText(e.target.value)} 
+                    style={{ width: '100%', fontSize: '0.9rem', borderLeft: `3px solid ${selectedColor !== '#FFFFFF' ? selectedColor : '#534AB7'}` }} 
+                  />
+                </div>
+              )}
+            </div>
           </form>
 
           <div className={styles.accordionList}>
             {appData[selectedCat].sections.map((sec, si) => {
-              if (sec.isTrail) return null;
               const isSecDragOver = dragOverSecIdx === si;
               const isSecDragging = draggingSecIdx === si;
+              const secColor = sec.color || '#FFFFFF';
 
               return (
                 <div key={si}
@@ -384,42 +369,58 @@ export const Settings = ({
                   onDragLeave={() => setDragOverSecIdx(null)}
                   onDrop={e => handleSecDrop(e, si)}
                   onDragEnd={cleanSecDrag}
+                  style={{ borderLeft: `4px solid ${secColor}` }}
                 >
                   <div className={`${styles.secHeader} ${expandedSec === si ? styles.secHeaderOpen : ''}`}>
                     {editingSec === si ? (
-                      <div className={styles.editRow} onClick={e => e.stopPropagation()}>
+                      <div className={styles.editRow} onClick={e => e.stopPropagation()} style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '12px', padding: '8px 0', width: '100%' }}>
                         <input autoFocus className={styles.editInput} value={editValue}
                           onChange={e => setEditValue(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && saveEditSec(si)}
-                          onBlur={() => saveEditSec(si)} />
+                          onKeyDown={e => e.key === 'Enter' && saveEditSec(si)} />
+                        
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                            <div style={{ display: 'flex', gap: '8px' }}>
+                              {CORES_PREDEFINIDAS.map(cor => (
+                                <button key={cor} type="button" onClick={() => setEditColor(cor)}
+                                  style={{ backgroundColor: cor, width: '24px', height: '24px', borderRadius: '50%', border: editColor === cor ? '2px solid #534AB7' : '2px solid #333', cursor: 'pointer' }} />
+                              ))}
+                            </div>
+                            
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>
+                              <input type="checkbox" checked={editHasGoals} onChange={(e) => setEditHasGoals(e.target.checked)} />
+                              Habilitar Metas
+                            </label>
+                            
+                            <button onClick={() => saveEditSec(si)} style={{ padding: '6px 12px', background: '#534AB7', color: '#FFF', borderRadius: '6px', border: 'none', cursor: 'pointer', fontWeight: 'bold', marginLeft: 'auto' }}>Salvar</button>
+                          </div>
+                          
+                          {/* CAMPO DE EDIÇÃO DA META */}
+                          {editHasGoals && (
+                            <input 
+                              type="text" 
+                              className={styles.editInput} 
+                              placeholder="Escreva qual é a meta..." 
+                              value={editGoalText} 
+                              onChange={e => setEditGoalText(e.target.value)} 
+                              style={{ width: '100%', fontSize: '0.9rem', borderLeft: `3px solid ${editColor !== '#FFFFFF' ? editColor : '#534AB7'}` }} 
+                            />
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className={styles.secTitleWrap} onClick={() => setExpandedSec(expandedSec === si ? null : si)}>
                         <span className={styles.secDragHandle} title="Arrastar seção">⠿</span>
-                        <span className={styles.secTitle}>{sec.title}</span>
+                        <span className={styles.secTitle} style={{ color: secColor }}>{sec.title} {sec.hasGoals && '🎯'}</span>
                         <span className={styles.secBadge}>{sec.items.length} itens</span>
                       </div>
                     )}
                     <div className={styles.actionGroup}>
-                      {/* Setas para mover seção */}
-                      <button className={styles.iconBtn} title="Mover para cima"
-                        onClick={e => { e.stopPropagation(); moveSection(si, -1); }}>
-                        <IconUp />
-                      </button>
-                      <button className={styles.iconBtn} title="Mover para baixo"
-                        onClick={e => { e.stopPropagation(); moveSection(si, 1); }}>
-                        <IconDown />
-                      </button>
-                      <button className={styles.iconBtn}
-                        onClick={e => { e.stopPropagation(); setEditValue(sec.title); setEditingSec(si); }}
-                        title="Editar"><IconEdit /></button>
-                      <button className={`${styles.iconBtn} ${styles.iconDanger}`}
-                        onClick={e => { e.stopPropagation(); handleDeleteSec(si); }}
-                        title="Excluir"><IconTrash /></button>
-                      <div className={styles.chevron}
-                        onClick={() => setExpandedSec(expandedSec === si ? null : si)}>
-                        {expandedSec === si ? '▲' : '▼'}
-                      </div>
+                      <button className={styles.iconBtn} title="Mover para cima" onClick={e => { e.stopPropagation(); moveSection(si, -1); }}><IconUp /></button>
+                      <button className={styles.iconBtn} title="Mover para baixo" onClick={e => { e.stopPropagation(); moveSection(si, 1); }}><IconDown /></button>
+                      <button className={styles.iconBtn} onClick={e => { e.stopPropagation(); setEditValue(sec.title); setEditColor(sec.color || CORES_PREDEFINIDAS[0]); setEditHasGoals(sec.hasGoals || false); setEditGoalText(sec.goalText || ''); setEditingSec(si); }} title="Editar"><IconEdit /></button>
+                      <button className={`${styles.iconBtn} ${styles.iconDanger}`} onClick={e => { e.stopPropagation(); handleDeleteSec(si); }} title="Excluir"><IconTrash /></button>
+                      <div className={styles.chevron} onClick={() => setExpandedSec(expandedSec === si ? null : si)}>{expandedSec === si ? '▲' : '▼'}</div>
                     </div>
                   </div>
 
@@ -440,12 +441,7 @@ export const Settings = ({
                             draggable
                             onDragStart={e => handleItemDragStart(e, si, ii)}
                             onDragOver={e => handleItemDragOver(e, si, ii)}
-                            onDragLeave={e => {
-                              // Só limpa se saiu do elemento mesmo (não de um filho)
-                              if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-                                setDragOverKey(null);
-                              }
-                            }}
+                            onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragOverKey(null); }}
                             onDrop={e => handleItemDrop(e, si, ii)}
                             onDragEnd={cleanItemDrag}
                           >
@@ -464,17 +460,9 @@ export const Settings = ({
                                 </div>
                               )}
                               <div className={styles.actionGroupTask}>
-                                <button className={styles.iconBtnSmall}
-                                  onClick={() => { setEditValue(item.label); setEditingItem({ si, ii }); }}>
-                                  <IconEdit />
-                                </button>
-                                <button className={`${styles.iconBtnSmall} ${styles.iconDanger}`}
-                                  onClick={() => handleDeleteItem(si, ii)}>
-                                  <IconTrash />
-                                </button>
-                                <div className={styles.taskChevron} onClick={() => toggleTaskExpansion(si, ii)}>
-                                  {isTaskExpanded ? '▲' : '▼'}
-                                </div>
+                                <button className={styles.iconBtnSmall} onClick={() => { setEditValue(item.label); setEditingItem({ si, ii }); }}><IconEdit /></button>
+                                <button className={`${styles.iconBtnSmall} ${styles.iconDanger}`} onClick={() => handleDeleteItem(si, ii)}><IconTrash /></button>
+                                <div className={styles.taskChevron} onClick={() => toggleTaskExpansion(si, ii)}>{isTaskExpanded ? '▲' : '▼'}</div>
                               </div>
                             </div>
 
@@ -482,10 +470,8 @@ export const Settings = ({
                               <div className={styles.taskExpandedBody}>
                                 <div className={styles.itemConfigRow}>
                                   <div className={styles.pillWrap}>
-                                    <button className={`${styles.urgPill} ${styles[meta.cls]}`}
-                                      onClick={() => setOpenUrgencyKey(openUrgencyKey === itemKey ? null : itemKey)}>
-                                      <span className={styles.urgDot} style={{ background: meta.dot }} />
-                                      {meta.text} ▾
+                                    <button className={`${styles.urgPill} ${styles[meta.cls]}`} onClick={() => setOpenUrgencyKey(openUrgencyKey === itemKey ? null : itemKey)}>
+                                      <span className={styles.urgDot} style={{ background: meta.dot }} />{meta.text} ▾
                                     </button>
                                     {openUrgencyKey === itemKey && (
                                       <div className={styles.urgDropdown}>
@@ -501,18 +487,12 @@ export const Settings = ({
                                   </div>
                                   <div className={styles.datePickerWrap}>
                                     <span className={styles.dateIcon}>📅</span>
-                                    <input type="date" className={styles.dateInput} value={currentDate}
-                                      onChange={e => setItemDates({ ...itemDates, [itemKey]: e.target.value || null })} />
-                                    {currentDate && (
-                                      <button className={styles.clearDateBtn}
-                                        onClick={() => setItemDates({ ...itemDates, [itemKey]: null })}>✕</button>
-                                    )}
+                                    <input type="date" className={styles.dateInput} value={currentDate} onChange={e => setItemDates({ ...itemDates, [itemKey]: e.target.value || null })} />
+                                    {currentDate && <button className={styles.clearDateBtn} onClick={() => setItemDates({ ...itemDates, [itemKey]: null })}>✕</button>}
                                   </div>
                                 </div>
 
-                                <textarea className={styles.infoTextarea}
-                                  placeholder="Adicionar descrição ou informações adicionais da tarefa..."
-                                  value={item.info || ''}
+                                <textarea className={styles.infoTextarea} placeholder="Adicionar descrição ou informações adicionais da tarefa..." value={item.info || ''}
                                   onChange={e => {
                                     setAppData(prev => {
                                       const s = [...prev[selectedCat].sections];
@@ -537,22 +517,14 @@ export const Settings = ({
                                         <span className={styles.subtaskLabel}>{sub.label}</span>
                                       )}
                                       <div className={styles.actionGroupSub}>
-                                        <button className={styles.iconBtnSub}
-                                          onClick={() => { setEditValue(sub.label); setEditingSubtask({ si, ii, subI }); }}>
-                                          <IconEdit />
-                                        </button>
-                                        <button className={`${styles.iconBtnSub} ${styles.iconDanger}`}
-                                          onClick={() => handleDeleteSubtask(si, ii, subI)}>
-                                          <IconTrash />
-                                        </button>
+                                        <button className={styles.iconBtnSub} onClick={() => { setEditValue(sub.label); setEditingSubtask({ si, ii, subI }); }}><IconEdit /></button>
+                                        <button className={`${styles.iconBtnSub} ${styles.iconDanger}`} onClick={() => handleDeleteSubtask(si, ii, subI)}><IconTrash /></button>
                                       </div>
                                     </div>
                                   ))}
                                   <form className={styles.miniForm} onSubmit={e => handleAddSubtask(e, si, ii)}>
                                     <span className={styles.subtaskTree}>└</span>
-                                    <input type="text" placeholder="Adicionar subtarefa e apertar Enter..."
-                                      value={newSubtaskText[`${si}_${ii}`] || ''}
-                                      onChange={e => setNewSubtaskText({ ...newSubtaskText, [`${si}_${ii}`]: e.target.value })} />
+                                    <input type="text" placeholder="Adicionar subtarefa e apertar Enter..." value={newSubtaskText[`${si}_${ii}`] || ''} onChange={e => setNewSubtaskText({ ...newSubtaskText, [`${si}_${ii}`]: e.target.value })} />
                                   </form>
                                 </div>
                               </div>
@@ -561,20 +533,12 @@ export const Settings = ({
                         );
                       })}
 
-                      {/* Drop zone para o último slot */}
-                      <div
-                        className={`${styles.dropZone} ${dragOverKey === `${si}_dropzone` ? styles.dropZoneActive : ''}`}
-                        onDragOver={e => handleDropZoneDragOver(e, si)}
-                        onDragLeave={() => { if (dragOverKey === `${si}_dropzone`) setDragOverKey(null); }}
-                        onDrop={e => handleDropZoneDrop(e, si)}
-                      >
+                      <div className={`${styles.dropZone} ${dragOverKey === `${si}_dropzone` ? styles.dropZoneActive : ''}`} onDragOver={e => handleDropZoneDragOver(e, si)} onDragLeave={() => { if (dragOverKey === `${si}_dropzone`) setDragOverKey(null); }} onDrop={e => handleDropZoneDrop(e, si)}>
                         {dragOverKey === `${si}_dropzone` ? 'Soltar aqui para mover para o final' : ''}
                       </div>
 
                       <form className={styles.addFormTask} onSubmit={e => handleAddItem(e, si)}>
-                        <input type="text" className={styles.inputTask} placeholder="+ Adicionar nova tarefa principal..."
-                          value={newItemText[si] || ''}
-                          onChange={e => setNewItemText({ ...newItemText, [si]: e.target.value })} />
+                        <input type="text" className={styles.inputTask} placeholder="+ Adicionar nova tarefa principal..." value={newItemText[si] || ''} onChange={e => setNewItemText({ ...newItemText, [si]: e.target.value })} />
                         <button type="submit" className={styles.submitBtnTask} disabled={!newItemText[si]?.trim()}>Adicionar</button>
                       </form>
                     </div>
@@ -584,90 +548,6 @@ export const Settings = ({
             })}
           </div>
         </div>
-
-        {/* COLUNA 2: TRILHA DE POSTS (Frontline) */}
-        {isFrontline && (
-          <div className={styles.colSide}>
-            <div className={styles.trailHeader}>
-              <h3 className={styles.trailTitle}>🏁 Trilha de Posts (Metas)</h3>
-            </div>
-
-            <form className={styles.addFormBase} onSubmit={handleAddMilestone}>
-              <input type="text" className={styles.inputMain} placeholder="Nome do novo marco / meta..."
-                value={newMilestoneTitle} onChange={e => setNewMilestoneTitle(e.target.value)} />
-              <button type="submit" className={styles.submitBtnTrail} disabled={!newMilestoneTitle.trim()}>+ Novo Marco</button>
-            </form>
-
-            <div className={styles.accordionList}>
-              {milestones.map((m, mi) => (
-                <div key={mi} className={`${styles.secCard} ${styles.trailCard}`}>
-                  <div className={`${styles.secHeader} ${expandedMilestone === mi ? styles.secHeaderOpen : ''}`}>
-                    {editingMilestone === mi ? (
-                      <div className={styles.editRow} onClick={e => e.stopPropagation()}>
-                        <input autoFocus className={styles.editInput} value={editValue}
-                          onChange={e => setEditValue(e.target.value)}
-                          onKeyDown={e => e.key === 'Enter' && saveEditMilestone(mi)}
-                          onBlur={() => saveEditMilestone(mi)} />
-                      </div>
-                    ) : (
-                      <div className={styles.secTitleWrap}
-                        onClick={() => setExpandedMilestone(expandedMilestone === mi ? null : mi)}>
-                        <span className={styles.trailNum}>#{mi + 1}</span>
-                        <span className={styles.secTitle}>{m.title}</span>
-                      </div>
-                    )}
-                    <div className={styles.actionGroup}>
-                      <button className={styles.iconBtn}
-                        onClick={e => { e.stopPropagation(); setEditValue(m.title); setEditingMilestone(mi); }}>
-                        <IconEdit />
-                      </button>
-                      <button className={`${styles.iconBtn} ${styles.iconDanger}`}
-                        onClick={e => { e.stopPropagation(); handleDeleteMilestone(mi); }}>
-                        <IconTrash />
-                      </button>
-                      <div className={styles.chevron}
-                        onClick={() => setExpandedMilestone(expandedMilestone === mi ? null : mi)}>
-                        {expandedMilestone === mi ? '▲' : '▼'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {expandedMilestone === mi && (
-                    <div className={styles.secBody}>
-                      {m.posts.map((post, pi) => (
-                        <div key={pi} className={styles.subtaskRow}>
-                          {editingPost?.mi === mi && editingPost?.pi === pi ? (
-                            <input autoFocus className={styles.editInputSmall} value={editValue}
-                              onChange={e => setEditValue(e.target.value)}
-                              onKeyDown={e => e.key === 'Enter' && saveEditPost(mi, pi)}
-                              onBlur={() => saveEditPost(mi, pi)} />
-                          ) : (
-                            <span className={styles.subtaskLabel}>📱 {post}</span>
-                          )}
-                          <div className={styles.actionGroupSub}>
-                            <button className={styles.iconBtnSub}
-                              onClick={() => { setEditValue(post); setEditingPost({ mi, pi }); }}>
-                              <IconEdit />
-                            </button>
-                            <button className={`${styles.iconBtnSub} ${styles.iconDanger}`}
-                              onClick={() => handleDeletePost(mi, pi)}>
-                              <IconTrash />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                      <form className={styles.miniForm} onSubmit={e => handleAddPost(e, mi)}>
-                        <input type="text" placeholder="+ Adicionar post/ação e apertar Enter..."
-                          value={newPostText[mi] || ''}
-                          onChange={e => setNewPostText({ ...newPostText, [mi]: e.target.value })} />
-                      </form>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

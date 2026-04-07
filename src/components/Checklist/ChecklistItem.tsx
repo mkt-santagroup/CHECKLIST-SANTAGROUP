@@ -26,7 +26,7 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({
   onToggleSubtask,
   urgency,
   date,
-  isHidden,
+  isHidden
 }) => {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
 
@@ -57,6 +57,7 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({
             <path d="M1.5 5.5L4.5 8.5L9.5 2.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
+        
         <span className={styles.itemLabel}>
           {item.label}
           {item.optional && <span className={styles.optional}>opcional</span>}
@@ -80,7 +81,6 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({
         )}
       </div>
 
-      {/* SUBTAREFAS */}
       {item.subtasks && item.subtasks.length > 0 && !isChecked && (
         <div className={styles.subtasksWrapper}>
           {item.subtasks.map((sub, sIdx) => {
@@ -99,7 +99,6 @@ export const ChecklistItem: React.FC<ChecklistItemProps> = ({
         </div>
       )}
 
-      {/* PAINEL DE INFORMAÇÕES (Só exibe o texto de descrição agora) */}
       {item.info && (
         <div className={`${styles.itemBottom} ${isPanelOpen ? styles.open : ''}`}>
           <div className={styles.infoText}>{item.info}</div>
