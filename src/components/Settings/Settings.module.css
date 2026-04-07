@@ -160,19 +160,21 @@
   border-radius: 8px;
   padding: 12px 14px;
   margin-bottom: 10px;
-  transition: all 0.2s;
+  transition: border 0.2s, background 0.2s; /* Removido o 'all' que causava bug de tamanho */
 }
 
 .itemBox:hover { background: #161618; border-color: #2a2a2e; }
 
+/* Correção Definitiva do Drag - sem mexer na posição física do elemento */
 .dragOverActive {
-  border-top: 3px solid #534AB7;
-  transform: translateY(2px);
+  border-top: 2px dashed #534AB7 !important;
+  background: #111116 !important;
 }
 
 .beingDragged {
-  opacity: 0.3;
+  opacity: 0.4;
   border: 1px dashed #534AB7;
+  background: #0a0a0f;
 }
 
 /* IGNORA EVENTOS DOS FILHOS DURANTE O DRAG PARA NAO BUGAR */
@@ -203,6 +205,43 @@
   padding-top: 14px;
   border-top: 1px dashed #222;
   margin-left: 28px;
+}
+
+/* Action Groups & Icons (Agora com as setas) */
+.actionGroup { display: flex; align-items: center; gap: 4px; }
+
+.actionGroupTask { 
+  display: flex; 
+  align-items: center; 
+  gap: 2px; /* Reduzido para caber as setas bonito */
+  opacity: 0.4; 
+  transition: opacity 0.2s; 
+}
+.itemBox:hover .actionGroupTask { opacity: 1; }
+
+.actionGroupSub { display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.2s; }
+
+.iconBtn, .iconBtnSmall, .iconBtnSub { 
+  background: transparent; border: none; color: #666; cursor: pointer; 
+  display: flex; align-items: center; justify-content: center; 
+  border-radius: 4px; transition: all 0.2s; 
+}
+.iconBtn { width: 28px; height: 28px; }
+.iconBtn svg { width: 15px; height: 15px; }
+.iconBtnSmall { width: 24px; height: 24px; }
+.iconBtnSmall svg { width: 13px; height: 13px; }
+.iconBtnSub { width: 20px; height: 20px; }
+.iconBtnSub svg { width: 11px; height: 11px; }
+
+.iconBtn:hover, .iconBtnSmall:hover, .iconBtnSub:hover { background: #2a2a2e; color: #fff; }
+.iconDanger:hover { background: #3a1010; color: #E05252; }
+
+/* Botões de subir/descer desativados (quando tá no topo ou no fundo) */
+.iconBtnSmall:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+  background: transparent !important;
+  color: #666 !important;
 }
 
 /* Meta Configurações (Urgência e Data) */
@@ -294,4 +333,56 @@
 .infoTextarea:focus {
   border-color: #534AB7;
   color: #eee;
+}
+
+/* ADICIONE ESTAS CLASSES AO FINAL DO SEU Settings.module.css EXISTENTE */
+
+/* Handle de arrasto das SEÇÕES */
+.secDragHandle {
+  font-size: 16px;
+  color: #444;
+  cursor: grab;
+  padding: 2px 6px 2px 0;
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.secDragHandle:hover {
+  color: #888;
+}
+
+/* Estados de drag das SEÇÕES */
+.secDragOver {
+  border-top: 3px solid #1D9E75 !important;
+  transform: translateY(2px);
+}
+
+.secBeingDragged {
+  opacity: 0.3;
+  border: 1px dashed #1D9E75 !important;
+}
+
+.secBeingDragged * {
+  pointer-events: none;
+}
+
+/* Drop zone no final da lista de itens */
+.dropZone {
+  height: 32px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 2px dashed transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: transparent;
+  transition: all 0.2s;
+}
+
+.dropZoneActive {
+  border-color: #534AB7;
+  background: #1a1638;
+  color: #8a7df0;
 }

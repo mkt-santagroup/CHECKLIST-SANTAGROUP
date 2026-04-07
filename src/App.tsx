@@ -11,27 +11,26 @@ import { ChecklistPanel } from './components/Checklist/ChecklistPanel';
 import { RoadmapPanel } from './components/Roadmap/RoadmapPanel';
 import { Settings } from './components/Settings/Settings';
 
-// A MÁGICA: Importando os dados originais de volta!
 import { DATA, MARCOS } from './constants/data';
 import { AppState, TabMode, Urgency, Milestone } from './types';
 
-// Mudei o ID para ele criar uma nova linha 100% preenchida no seu banco
-const BOARD_ID = '22222222-2222-2222-2222-222222222222'; 
+const BOARD_ID = '22222222-2222-2222-2222-222222222222';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState<'home' | 'settings'>('home');
   const [currentTab, setCurrentTab] = useState<TabMode>('back');
   const [activeFilter, setActiveFilter] = useState('all');
-  
-  // Estados de Dados (Agora iniciando com as constantes)
-  const [appData, setAppData] = useState(DATA); 
+
+  const [appData, setAppData] = useState(DATA);
   const [milestones, setMilestones] = useState<Milestone[]>(MARCOS);
   const [launchDate, setLaunchDate] = useState<string | null>(null);
   const [checklistState, setChecklistState] = useState<AppState>({ back: {}, front: {}, entregaveis: {} });
   const [itemUrgencies, setItemUrgencies] = useState<Record<string, Urgency>>({});
   const [itemDates, setItemDates] = useState<Record<string, string | null>>({});
 
+  // Controla se a última mudança veio de NÓS (para ignorar o echo do realtime)
+  const isSyncing = useRef(false);
   const lastSyncStr = useRef("");
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export default function App() {
       const { data, error } = await supabase.from('launch_board').select('*').eq('id', BOARD_ID).single();
 
       if (error || !data) {
-        // Se o banco for novo, INSERE O DATA E O MARCOS ORIGINAIS
         await supabase.from('launch_board').insert([{
           id: BOARD_ID,
           app_data: DATA,
@@ -56,10 +54,10 @@ export default function App() {
         setItemUrgencies(data.item_urgencies);
         setItemDates(data.item_dates);
         setLaunchDate(data.launch_date);
-        
-        lastSyncStr.current = JSON.stringify({ 
-          appData: data.app_data, milestones: data.milestones, checklistState: data.checklist_state, 
-          itemUrgencies: data.item_urgencies, itemDates: data.item_dates, launchDate: data.launch_date 
+
+        lastSyncStr.current = JSON.stringify({
+          appData: data.app_data, milestones: data.milestones, checklistState: data.checklist_state,
+          itemUrgencies: data.item_urgencies, itemDates: data.item_dates, launchDate: data.launch_date
         });
       }
       setLoading(false);
@@ -70,12 +68,19 @@ export default function App() {
     const channel = supabase.channel('board-updates').on(
       'postgres_changes', { event: 'UPDATE', schema: 'public', table: 'launch_board', filter: `id=eq.${BOARD_ID}` },
       (payload) => {
+        // Se fomos NÓS que salvamos, ignora o echo do realtime
+        if (isSyncing.current) return;
+
         const n = payload.new;
-        lastSyncStr.current = JSON.stringify({
+        const incoming = JSON.stringify({
           appData: n.app_data, milestones: n.milestones, checklistState: n.checklist_state,
           itemUrgencies: n.item_urgencies, itemDates: n.item_dates, launchDate: n.launch_date
         });
-        
+
+        // Só aplica se for diferente do estado atual (outra aba/usuário)
+        if (incoming === lastSyncStr.current) return;
+
+        lastSyncStr.current = incoming;
         setAppData(n.app_data);
         setMilestones(n.milestones || []);
         setChecklistState(n.checklist_state);
@@ -95,6 +100,8 @@ export default function App() {
 
     const timer = setTimeout(async () => {
       lastSyncStr.current = currentStr;
+      isSyncing.current = true;
+
       await supabase.from('launch_board').update({
         app_data: appData,
         milestones: milestones,
@@ -103,6 +110,9 @@ export default function App() {
         item_dates: itemDates,
         launch_date: launchDate
       }).eq('id', BOARD_ID);
+
+      // Dá um tempo para o echo do realtime chegar e ser ignorado
+      setTimeout(() => { isSyncing.current = false; }, 800);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -136,7 +146,7 @@ export default function App() {
 
   const handleReset = () => {
     if (currentTab === 'roadmap') return;
-    if(confirm("Tem certeza que deseja resetar o progresso desta categoria?")) {
+    if (confirm("Tem certeza que deseja resetar o progresso desta categoria?")) {
       setChecklistState(prev => ({ ...prev, [currentTab]: {} }));
     }
   };
@@ -154,8 +164,8 @@ export default function App() {
       <Header currentView={currentView} onNavigate={setCurrentView} />
 
       {currentView === 'settings' ? (
-        <Settings 
-          appData={appData} setAppData={setAppData} 
+        <Settings
+          appData={appData} setAppData={setAppData}
           milestones={milestones} setMilestones={setMilestones}
           itemUrgencies={itemUrgencies} setItemUrgencies={setItemUrgencies}
           itemDates={itemDates} setItemDates={setItemDates}
