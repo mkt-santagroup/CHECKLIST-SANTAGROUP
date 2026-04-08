@@ -1,12 +1,15 @@
+// src/components/Tabs/Tabs.tsx
+
 import { TabMode } from '../../types';
 import styles from './Tabs.module.css';
 
 interface TabsProps {
   current: TabMode;
   onSwitchTab: (tab: TabMode) => void;
+  driveLink?: string;
 }
 
-export const Tabs = ({ current, onSwitchTab }: TabsProps) => {
+export const Tabs = ({ current, onSwitchTab, driveLink }: TabsProps) => {
   return (
     <div className={styles.controlsRow}>
       <div className={styles.toggle}>
@@ -29,12 +32,33 @@ export const Tabs = ({ current, onSwitchTab }: TabsProps) => {
           Entregáveis
         </button>
       </div>
-      <button
-        className={`${styles.roadmapBtn} ${current === 'roadmap' ? styles.activeRoadmap : ''}`}
-        onClick={() => onSwitchTab('roadmap')}
-      >
-        🗺️ ROADMAP
-      </button>
+      
+      {/* Container agrupando ROADMAP e Drive juntos */}
+      <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <button
+          className={`${styles.roadmapBtn} ${current === 'roadmap' ? styles.activeRoadmap : ''}`}
+          onClick={() => onSwitchTab('roadmap')}
+        >
+          🗺️ ROADMAP
+        </button>
+
+        {/* Usando a mesma classe styles.roadmapBtn para ficarem idênticos */}
+        <a 
+          href={driveLink || '#'}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(e) => { 
+            if (!driveLink) { 
+              e.preventDefault(); 
+              alert('Link não configurado! Vá em Ajustes (ícone de engrenagem) para definir.'); 
+            } 
+          }}
+          className={styles.roadmapBtn}
+          style={{ textDecoration: 'none' }}
+        >
+          📁 Drive ↗
+        </a>
+      </div>
     </div>
   );
 };

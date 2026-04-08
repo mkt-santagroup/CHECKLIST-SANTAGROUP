@@ -27,10 +27,19 @@ export default function App() {
   const [checklistState, setChecklistState] = useState<AppState>({ back: {}, front: {}, entregaveis: {} });
   const [itemUrgencies, setItemUrgencies] = useState<Record<string, Urgency>>({});
   const [itemDates, setItemDates] = useState<Record<string, string | null>>({});
+  const [driveLink, setDriveLink] = useState('');
 
   // Controla se a última mudança veio de NÓS (para ignorar o echo do realtime)
   const isSyncing = useRef(false);
   const lastSyncStr = useRef("");
+
+  useEffect(() => {
+    if (currentView === 'home') {
+      supabase.from('link_drive').select('link').eq('id', 1).single().then(({ data }) => {
+        if (data) setDriveLink(data.link);
+      });
+    }
+  }, [currentView]);
 
   useEffect(() => {
     const fetchBoard = async () => {
@@ -167,7 +176,9 @@ export default function App() {
       ) : (
         <>
           <LaunchBanner launchDate={launchDate} onSetLaunchDate={setLaunchDate} onClearLaunchDate={() => setLaunchDate(null)} />
-          <Tabs current={currentTab} onSwitchTab={setCurrentTab} />
+          
+          <Tabs current={currentTab} onSwitchTab={setCurrentTab} driveLink={driveLink} />
+
           <ProgressBar current={currentTab} percentage={stats.percentage} onReset={handleReset} />
           <Stats current={currentTab} done={stats.done} total={stats.total} />
           <Legend current={currentTab} />
